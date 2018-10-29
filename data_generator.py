@@ -6,22 +6,24 @@ https://github.com/ipython-books/cookbook-2nd/blob/master/chapter12_deterministi
 """
 import numpy as np
 import matplotlib.pyplot as plt # auxiliary module, only for demo is used
+from constants import data_path, size_wolfram, steps_wolfram, prob_of_ones_tpl_wolfram
 
 
 class GenerateByWolframCode:
     """
     Class for generating Wolfram based cellular automatas datasets.
     """
-    def __init__(self, path="data/", size=100, steps=100, prob_of_ones_lst=[0.05, 0.3, 0.5, 0.7, 0.95]):
+    def __init__(self, path=data_path, size=size_wolfram, steps=steps_wolfram,
+                 prob_of_ones_tpl=prob_of_ones_tpl_wolfram):
         """
         Generates
         :param path: path where generated data-sets would be saved
         :param size: the size of 1D CA
         :param steps: number of evolutionary steps
-        :param prob_of_ones_lst: probability with which 'ones' are generated in initial random conditions
+        :param prob_of_ones_tpl: probability with which 'ones' are generated in initial random conditions
         """
         self.path = path
-        self.prob_of_ones_lst = prob_of_ones_lst
+        self.prob_of_ones_tpl = prob_of_ones_tpl
         # vector is used to obtain numbers written in binary representation
         self.u = np.array([[4], [2], [1]])
         self.num_of_rules = 255
@@ -55,22 +57,6 @@ class GenerateByWolframCode:
             x[i + 1, :] = self._step(x[i, :], rule_b)
         return x
 
-    def _demo(self):
-        """
-        Auxiliary method.
-        """
-        fig, axes = plt.subplots(3, 3, figsize=(8, 8))
-        rules = [3, 18, 30,
-                 90, 106, 110,
-                 158, 154, 184]
-        for ax, rule in zip(axes.flat, rules):
-            x = self._evolve(rule)
-            ax.imshow(x, interpolation='none',
-                      cmap=plt.cm.binary)
-            ax.set_axis_off()
-            ax.set_title(str(rule))
-        plt.show()
-
     def _show_generated_image(self, rule, prob):
         im = np.load(self.path + "rule_{}_{}.npy".format(rule, prob))
         plt.imshow(im, cmap=plt.cm.binary)
@@ -81,14 +67,12 @@ class GenerateByWolframCode:
         Generates data-set and save to 'path'dir in the form of .npy files
         """
         for rule in range(self.num_of_rules):
-            for prob_of_one_init in self.prob_of_ones_lst:
+            for prob_of_one_init in self.prob_of_ones_tpl:
                 x = self._evolve(rule, prob_of_one_init)
                 np.save(self.path + "rule_{}_{}.npy".format(rule, prob_of_one_init), x)
 
 
 if __name__ == "__main__":
-    # generateByWolframCode = GenerateByWolframCode()
-    # generateByWolframCode._demo()
     g = GenerateByWolframCode()
     # g.generate_dataset()
     g._show_generated_image(120, 0.5)
